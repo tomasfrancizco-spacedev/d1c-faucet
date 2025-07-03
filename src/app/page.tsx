@@ -83,6 +83,31 @@ export default function Home() {
         )}
         {error && <div className="text-red-500 mt-4">{error}</div>}
       </div>
+
+      {/* How It Works Section */}
+      <div className="mt-12 max-w-2xl mx-auto px-4">
+        <h2 className="text-[#15C0B9] text-2xl font-bold mb-6 text-center">How It Works</h2>
+        <div className="bg-[#23232a] p-6 rounded-2xl shadow-lg">
+          <ol className="space-y-4 text-[#E6F0F0]">
+            <li className="flex items-start">
+              <span className="bg-[#15C0B9] text-[#19181C] font-bold rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">1</span>
+              <span>Enter your Solana wallet address and complete the verification</span>
+            </li>
+            <li className="flex items-start">
+              <span className="bg-[#15C0B9] text-[#19181C] font-bold rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">2</span>
+              <span>Click &quot;Get 100 $D1C Tokens&quot; to submit your request</span>
+            </li>
+            <li className="flex items-start">
+              <span className="bg-[#15C0B9] text-[#19181C] font-bold rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">3</span>
+              <span>Our system automatically creates your token account if needed</span>
+            </li>
+            <li className="flex items-start">
+              <span className="bg-[#15C0B9] text-[#19181C] font-bold rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">4</span>
+              <span>100 $D1C tokens are sent to your wallet instantly</span>
+            </li>
+          </ol>
+        </div>
+      </div>
       <style jsx>{`
         .faucet-btn {
           position: relative;
