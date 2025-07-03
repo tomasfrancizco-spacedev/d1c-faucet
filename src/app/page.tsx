@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Home() {
   const [address, setAddress] = useState("");
@@ -38,9 +39,18 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col justify-center items-center bg-[#19181C]">
-      <h1 className="text-[#15C0B9] text-3xl font-bold mb-6">
-        Division 1 Crypto Faucet
-      </h1>
+      <div className="flex flex-col items-center mb-8">
+        <Image
+          src="/divisionlogo2.png"
+          alt="Division 1 Crypto Logo"
+          width={120}
+          height={120}
+          className="mb-4"
+        />
+        <h1 className="text-[#15C0B9] text-3xl font-bold">
+          Division 1 Crypto Faucet
+        </h1>
+      </div>
       <div className="bg-[#23232a] p-8 rounded-2xl shadow-lg min-w-[320px] w-full max-w-sm">
         <label className="text-[#E6F0F0] font-medium">Solana Address</label>
         <input

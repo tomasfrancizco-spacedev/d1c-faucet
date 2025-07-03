@@ -14,7 +14,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Division 1 Crypto Faucet",
-  description: "Faucet for Division 1 Crypto",
+  description: "Get your $D1C tokens from the Division 1 Crypto faucet",
+  icons: {
+    icon: "/divisionlogo2.png",
+  },
 };
 
 export default function RootLayout({
