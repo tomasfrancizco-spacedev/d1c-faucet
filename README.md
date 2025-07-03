@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Division 1 Crypto ($D1C) Token Faucet
+
+A simple Solana token faucet for the Division 1 Crypto ($D1C) token. Users can request 100 $D1C tokens by providing their Solana wallet address.
+
+## Live Demo
+
+🌐 **Deployed at:** [d1c-faucet.vercel.app](https://d1c-faucet.vercel.app)
+
+## Features
+
+- 🪙 Request 100 $D1C tokens per transaction
+- 🔐 Automatic associated token account creation
+
+## Tech Stack
+
+- **Frontend:** Next.js 14, React, TypeScript, Tailwind CSS
+- **Blockchain:** Solana Web3.js, SPL Token
+- **Deployment:** Vercel
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- npm, yarn, pnpm, or bun
+- Solana CLI (optional, for testing)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd d1c-faucet
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Create a `.env.local` file in the root directory with your configuration:
+```env
+NEXT_PUBLIC_SOLANA_FAUCET_PK=[your-faucet-private-key]
+NEXT_PUBLIC_SOLANA_TOKEN_MINT_ACCOUNT=[your-token-mint-address]
+NEXT_PUBLIC_SOLANA_DEVNET_RPC_URL=[your-rpc-url]
+```
+
+4. Install Solana dependencies:
+```bash
+npm install @solana/web3.js @solana/spl-token
+```
+
+5. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How It Works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **User Input:** Users enter their Solana wallet address
+2. **Validation:** The system validates the address format (44 characters)
+3. **Token Account Check:** The faucet checks if the user has an associated token account for $D1C
+4. **Account Creation:** If no token account exists, one is automatically created
+5. **Token Transfer:** 100 $D1C tokens are sent from the faucet to the user's address
+6. **Confirmation:** User receives confirmation with transaction signature
 
-## Learn More
+## Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXT_PUBLIC_SOLANA_FAUCET_PK` | Private key of the faucet account (JSON array format) | Yes |
+| `NEXT_PUBLIC_SOLANA_TOKEN_MINT_ACCOUNT` | Public key of the $D1C token mint | Yes |
+| `NEXT_PUBLIC_SOLANA_DEVNET_RPC_URL` | Solana RPC endpoint (defaults to devnet) | No |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Endpoints
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### POST `/api/faucet`
 
-## Deploy on Vercel
+Sends 100 $D1C tokens to the specified Solana address.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Request Body:**
+```json
+{
+  "address": "Solana wallet address"
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Response:**
+```json
+{
+  "success": true,
+  "signature": "transaction_signature"
+}
+```
