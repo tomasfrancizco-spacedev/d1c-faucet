@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Connection, Keypair, PublicKey, clusterApiUrl, Transaction, sendAndConfirmTransaction } from '@solana/web3.js';
-import { getOrCreateAssociatedTokenAccount, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { createTransferCheckedInstruction, TOKEN_2022_PROGRAM_ID, getAssociatedTokenAddress, getAccount, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
+import bs58 from 'bs58';
 
-const FAUCET_PK = process.env.NEXT_PUBLIC_SOLANA_FAUCET_PK;
+const FAUCET_PK = process.env.SOLANA_FAUCET_PK;
 const TOKEN_MINT = process.env.NEXT_PUBLIC_SOLANA_TOKEN_MINT_ACCOUNT;
 const RPC_URL = process.env.NEXT_PUBLIC_SOLANA_DEVNET_RPC_URL || clusterApiUrl('devnet');
 
@@ -17,43 +18,74 @@ export async function POST(req: NextRequest) {
     }
 
     const connection = new Connection(RPC_URL, 'confirmed');
-    const faucetKeypair = Keypair.fromSecretKey(
-      Uint8Array.from(JSON.parse(FAUCET_PK))
-    );
-    const mint = new PublicKey(TOKEN_MINT);
+
+    const faucetKeypair = Keypair.fromSecretKey(bs58.decode(FAUCET_PK));
+    const mintAddress = new PublicKey(TOKEN_MINT);
     const recipient = new PublicKey(address);
 
-    // Get or create recipient's associated token account
-    const recipientTokenAccount = await getOrCreateAssociatedTokenAccount(
-      connection,
-      faucetKeypair,
-      mint,
-      recipient
-    );
-
-    // Get faucet's associated token account
-    const faucetTokenAccount = await getOrCreateAssociatedTokenAccount(
-      connection,
-      faucetKeypair,
-      mint,
-      faucetKeypair.publicKey
-    );
-
+    let associatedTokenAccount;
+    try {
+      // Get or create recipient's associated token account
+      associatedTokenAccount = await getAssociatedTokenAddress(
+        mintAddress,
+        recipient,
+        false, // allowOwnerOffCurve
+        TOKEN_2022_PROGRAM_ID,
+      );
+    } catch (error) {
+      console.error("Error creating recipient token account:", error);
+      throw error;
+    }
+    let faucetTokenAccount;
+    try {
+      faucetTokenAccount = await getAssociatedTokenAddress(
+        mintAddress,
+        faucetKeypair.publicKey,
+        false, // allowOwnerOffCurve
+        TOKEN_2022_PROGRAM_ID,
+      );
+    } catch (error) {
+      console.error("Error creating faucet token account:", error);
+      throw error;
+    }
     // Create transfer instruction (100 tokens, 9 decimals)
     const amount = 100 * 1_000_000_000;
-    const tx = new Transaction().add(
-      createTransferInstruction(
-        faucetTokenAccount.address,
-        recipientTokenAccount.address,
-        faucetKeypair.publicKey,
-        amount,
-        [],
-        TOKEN_PROGRAM_ID
-      )
+    const transaction = new Transaction();
+    try {
+      await getAccount(connection, associatedTokenAccount, 'confirmed', TOKEN_2022_PROGRAM_ID);
+    } catch (error) {
+      console.error("Error getting associated token account:", error);
+      const createATAInstruction = createAssociatedTokenAccountInstruction(
+        faucetKeypair.publicKey, // payer
+        associatedTokenAccount, // associated token account
+        recipient, // owner
+        mintAddress, // mint
+        TOKEN_2022_PROGRAM_ID,
+      );
+      transaction.add(createATAInstruction);
+    }
+
+    const transferInstruction = createTransferCheckedInstruction(
+      faucetTokenAccount,
+      mintAddress,
+      associatedTokenAccount,
+      faucetKeypair.publicKey,
+      amount,
+      9,
+      [],
+      TOKEN_2022_PROGRAM_ID
     );
 
-    const sig = await sendAndConfirmTransaction(connection, tx, [faucetKeypair]);
-    return NextResponse.json({ success: true, signature: sig });
+    transaction.add(transferInstruction);
+
+    try{
+      const sig = await sendAndConfirmTransaction(connection, transaction, [faucetKeypair]);
+      return NextResponse.json({ success: true, signature: sig });
+    } catch (error: any) {
+      console.error("Error sending transaction:", error);
+      return NextResponse.json({ error: error.message || 'Internal error' }, { status: 500 });
+    }
+
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Internal error' }, { status: 500 });
   }

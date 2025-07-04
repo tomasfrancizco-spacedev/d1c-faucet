@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
+
 export default function Home() {
   const [address, setAddress] = useState("");
   const [success, setSuccess] = useState(false);
@@ -26,7 +27,8 @@ export default function Home() {
       if (response.ok) {
         setSuccess(true);
       } else {
-        setError("Failed to request tokens");
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to request tokens");
       }
       
     } catch (error) {
@@ -51,8 +53,9 @@ export default function Home() {
           Division 1 Crypto Faucet
         </h1>
       </div>
-      <div className="bg-[#23232a] p-8 rounded-2xl shadow-lg min-w-[320px] w-full max-w-sm">
-        <label className="text-[#E6F0F0] font-medium">Solana Address</label>
+      {/* Faucet Form */}
+      <div className="bg-[#23232a] p-8 rounded-2xl shadow-lg min-w-[320px] w-full max-w-2xl">
+        {/* <label className="text-[#E6F0F0] font-medium">Solana Address</label> */}
         <input
           type="text"
           value={address}
@@ -74,7 +77,7 @@ export default function Home() {
               : "bg-[#15C0B9] hover:bg-gradient-to-r hover:from-[#15C0B9] hover:to-[#E6F0F0] cursor-pointer text-[#19181C]")
           }
         >
-          {loading ? "Requesting..." : "Get 100 $D1C Tokens"}
+          {loading ? "Requesting..." : "Get 100 $D1C Devnet Tokens"}
         </button>
         {success && (
           <div className="text-[#15C0B9] mt-4">
@@ -85,7 +88,7 @@ export default function Home() {
       </div>
 
       {/* How It Works Section */}
-      <div className="mt-12 max-w-2xl mx-auto px-4">
+      <div className="mt-12 max-w-2xl mx-auto px-4 min-w-[320px]">
         <h2 className="text-[#15C0B9] text-2xl font-bold mb-6 text-center">How It Works</h2>
         <div className="bg-[#23232a] p-6 rounded-2xl shadow-lg">
           <ol className="space-y-4 text-[#E6F0F0]">
@@ -95,7 +98,7 @@ export default function Home() {
             </li>
             <li className="flex items-start">
               <span className="bg-[#15C0B9] text-[#19181C] font-bold rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">2</span>
-              <span>Click &quot;Get 100 $D1C Tokens&quot; to submit your request</span>
+              <span>Click &quot;Get 100 $D1C Devnet Tokens&quot; to submit your request</span>
             </li>
             <li className="flex items-start">
               <span className="bg-[#15C0B9] text-[#19181C] font-bold rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">3</span>
