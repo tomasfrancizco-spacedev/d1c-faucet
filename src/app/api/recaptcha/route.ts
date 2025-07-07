@@ -1,6 +1,6 @@
-// app/api/route.ts
+// app/api/recaptcha/route.ts
 
-import axios from "axios";
+import { verifyRecaptcha } from "@/utils/recaptcha";
 
 export async function POST(req: Request) {
   if (req.method !== "POST") {
@@ -12,7 +12,6 @@ export async function POST(req: Request) {
 
   const data = await req.json();
   const { token } = data;
-  const secretKey: string | undefined = process.env.RECAPTCHA_SECRET_KEY;
 
   if (!token) {
     return new Response(JSON.stringify({ message: "Token not found" }), {
@@ -21,11 +20,9 @@ export async function POST(req: Request) {
   }
 
   try {
-    const response = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`,
-    );
+    const isValid = await verifyRecaptcha(token);
 
-    if (response.data.success) {
+    if (isValid) {
       return new Response(JSON.stringify({ message: "Success" }), {
         status: 200,
       });
