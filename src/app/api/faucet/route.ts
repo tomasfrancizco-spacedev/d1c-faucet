@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate address
-    if (!address || address.length !== 44) {
+    const SOLANA_ADDRESS_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+    if (!SOLANA_ADDRESS_REGEX.test(address)) {
       return NextResponse.json({ error: 'Invalid address' }, { status: 400 });
     }
     
